@@ -10,7 +10,6 @@ const executeCode = async (codeFilePath) => {
     if(codeLanguage === 'cpp') {
       const codeFileName = path.basename(codeFilePath).split(".")[0];
       const outputFilePath = await outputFile(codeFilePath);
-
       exec(
         `g++ ${codeFilePath} -o ${outputFilePath} && cd ${outputDirectory} && ./${codeFileName}.out`,
         (err, stdout, stderr) => {
