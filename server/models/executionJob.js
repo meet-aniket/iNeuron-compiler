@@ -28,6 +28,7 @@ const jobSchema = mongoose.Schema({
   output: {
     type: String
   }
-})
+});
 
-module.exports = mongoose.model("executionJob", jobSchema);
+const executionJob = mongoose.model("executionJob", jobSchema);
+module.exports = { executionJob };
