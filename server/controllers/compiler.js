@@ -1,6 +1,6 @@
-const { codeFile } = require("../utils/generateFiles");
-const { executeCode } = require("../utils/executeFile");
+const { codeFile } = require("../services/generateFiles");
 const { executionJob } = require("../models/executionJob");
+const { addJobToQueue } = require("../services/jobQueue");
 
 exports.compiler = async (req, res) => {
   // CPP is used as default programming language
@@ -15,14 +15,33 @@ exports.compiler = async (req, res) => {
 
   // Generate code file
   const codeFilePath = await codeFile(code, language);
+
+  // Write execution-job into database and schedule it as job in queue
+  const { _id: jobId } = new executionJob({ language, codeFilePath })
+  await addJobToQueue(jobId);
   
-  // Execute code file
-  try{
-    const result =  await executeCode(codeFilePath);
-    return res.status(200).json({
-      output: result
-    })
-  } catch(err) {
-    console.error(err);
-  } 
+  res.status(201).json({ jobId });
+}
+
+exports.output = async (req, res) => {
+  const jobId = req.query.id;
+  if(!jobId) {
+    return res.status(400).json({
+      success: false,
+      error: "missing _id query param!"
+    });
+  }
+
+  const job = await executionJob.findById(jobId);
+  if(!job) {
+    return res.status(400).json({
+      success: false,
+      error: "could not find job!"
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    job
+  });
 }

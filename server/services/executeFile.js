@@ -1,7 +1,7 @@
 const path = require("path");
 const { exec } = require("child_process");
-const { outputFile } = require("../utils/generateFiles");
-const { outputDirectory } = require("../utils/generateDirs");
+const { outputFile } = require("../services/generateFiles");
+const { outputDirectory } = require("../services/generateDirs");
 
 const executeCode = async (codeFilePath) => {
   const codeLanguage = codeFilePath.split('.')[1];

@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { v4: uuid } = require("uuid");
 
-const { codeDirectory, outputDirectory } = require("../utils/generateDirs");
+const { codeDirectory, outputDirectory } = require("../services/generateDirs");
 
 const codeFile = async(content, format) => {
   const jobId = uuid();
