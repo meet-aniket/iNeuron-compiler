@@ -18,7 +18,7 @@ exports.compiler = async (req, res) => {
 
   // Write execution-job into database and schedule it as job in queue
   const { _id: jobId } = new executionJob({ language, codeFilePath })
-  await addJobToQueue(jobId);
+  addJobToQueue(jobId);
   
   res.status(201).json({ jobId });
 }
