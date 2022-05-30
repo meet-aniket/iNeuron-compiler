@@ -3,29 +3,25 @@ const Queue = require('bull');
 const { executionJob } = require("../models/executionJob");
 const { executeCode } = require("../services/executeFile");
 
-const jobQueue = new Queue('job-runner-queue');
+const jobQueue = new Queue('job-runner-queue', 'redis://127.0.0.1:6379');
 
 // Process a execution job
-jobQueue.process( async(data) => {
-  console.log('data', data)
-  const jobId = data.id;
-  const job = await executionJob.findById(jobId);
+jobQueue.process( async(job) => {
+  const jobId = job?.data?.id;
+  const Job = await executionJob.findById(jobId);
 
-  if(!job) {
-    throw Error(`can not find with id: ${jobId}`);
-  }
   try {
-    job.startedAt = new Date();
-    job.output = await executeCode(job?.filePath);
-    job.completedAt = new Date();
-    job.status = 'success';
-    await job.save();
+    Job.startedAt = new Date();
+    Job.output = await executeCode(Job?.filePath);
+    Job.completedAt = new Date();
+    Job.status = 'success';
+    await Job.save();
     return true;
   } catch(err) {
-    job.completedAt = new Date();
-    job.output = JSON.stringify(err);
-    job.status = 'error';
-    await job.save();
+    Job.completedAt = new Date();
+    Job.output = JSON.stringify(err);
+    Job.status = 'error';
+    await Job.save();
     throw Error(JSON.stringify(err));
   }
 });
